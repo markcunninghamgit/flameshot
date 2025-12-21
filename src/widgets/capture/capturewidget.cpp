@@ -1438,9 +1438,9 @@ void CaptureWidget::handleToolSignal(CaptureTool::Request r)
         case CaptureTool::REQ_SHOW_COLOR_PICKER:
             // TODO
             break;
-        case CaptureTool::REQ_CAPTURE_DONE_OK:
-            m_captureDone = true;
-            break;
+        case CaptureTool::REQ_CAPTURE_DONE_OK: {
+            scheduleDelayedCapture(m_context.request.delayAfterSelection());
+        } break;
         case CaptureTool::REQ_CLEAR_SELECTION:
             if (m_panel->activeLayerIndex() >= 0) {
                 m_panel->setActiveLayer(-1);
@@ -1481,9 +1481,66 @@ void CaptureWidget::handleToolSignal(CaptureTool::Request r)
         case CaptureTool::REQ_DECREASE_TOOL_SIZE:
             setToolSize(m_context.toolSize - 1);
             break;
+        case CaptureTool::REQ_DELAY_INCREASE: {
+            adjustDelaySeconds(1);
+        } break;
+        case CaptureTool::REQ_DELAY_DECREASE: {
+            adjustDelaySeconds(-1);
+        } break;
         default:
             break;
     }
+}
+
+void CaptureWidget::scheduleDelayedCapture(uint postDelayMs)
+{
+    if (postDelayMs == 0) {
+        m_captureDone = true;
+        return;
+    }
+
+    // Schedule the actual screen grab to happen after postDelay milliseconds.
+    QRect geometry = m_context.selection;
+    geometry.setTopLeft(geometry.topLeft() + m_context.widgetOffset);
+
+    // Give user feedback and close UI.
+    OverlayMessage::push(
+      tr("Capture will be taken in %1 seconds").arg(postDelayMs / 1000));
+    SystemNotification notifier(this);
+    notifier.sendMessage(
+      tr("Capture will be taken in %1 seconds").arg(postDelayMs / 1000));
+
+    close();
+    AbstractLogger::info(AbstractLogger::Stdout)
+      << QStringLiteral("Scheduled delayed capture in %1 ms").arg(postDelayMs);
+
+    auto req = m_context.request;
+
+    QTimer::singleShot(postDelayMs, [geometry, req]() mutable {
+        AbstractLogger::info(AbstractLogger::Stdout)
+          << QStringLiteral("Executing delayed capture now");
+        bool ok = true;
+        QPixmap desktop = ScreenGrabber().grabEntireDesktop(ok);
+        if (!ok || desktop.isNull()) {
+            AbstractLogger::error() << QStringLiteral(
+              "Delayed capture failed: unable to grab screen");
+            Flameshot::instance()->captureFailed();
+            return;
+        }
+        QPixmap pix = desktop.copy(geometry);
+        Flameshot::instance()->exportCapture(pix, geometry, req);
+        AbstractLogger::info(AbstractLogger::Stdout)
+          << QStringLiteral("Delayed capture finished");
+    });
+}
+
+void CaptureWidget::adjustDelaySeconds(int deltaSeconds)
+{
+    int current =
+      static_cast<int>(m_context.request.delayAfterSelection() / 1000);
+    current = qMax(0, current + deltaSeconds);
+    m_context.request.setDelayAfterSelection(static_cast<uint>(current * 1000));
+    OverlayMessage::push(tr("Delay set to %1 seconds").arg(current));
 }
 
 /**
