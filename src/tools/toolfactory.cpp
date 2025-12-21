@@ -11,6 +11,8 @@
 #ifdef ENABLE_IMGUR
 #include "imgupload/imguploadertool.h"
 #endif
+#include "delay/delayaddtool.h"
+#include "delay/delaysubtool.h"
 #include "invert/inverttool.h"
 #include "launcher/applaunchertool.h"
 #include "line/linetool.h"
@@ -66,6 +68,8 @@ CaptureTool* ToolFactory::CreateTool(CaptureTool::Type t, QObject* parent)
         if_TYPE_return_TOOL(TYPE_SIZEDECREASE, SizeDecreaseTool);
         if_TYPE_return_TOOL(TYPE_INVERT, InvertTool);
         if_TYPE_return_TOOL(TYPE_ACCEPT, AcceptTool);
+        if_TYPE_return_TOOL(TYPE_DELAY_DECREASE, DelaySubTool);
+        if_TYPE_return_TOOL(TYPE_DELAY_INCREASE, DelayAddTool);
         default:
             return nullptr;
     }
