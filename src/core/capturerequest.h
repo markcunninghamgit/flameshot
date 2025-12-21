@@ -29,15 +29,22 @@ public:
         ACCEPT_ON_SELECT = 64,
     };
 
+    // delay: delay before the capture UI is shown (existing behavior)
+    // delayAfterSelection: delay after the user accepts the selection and
+    // before the actual export/capture is performed. Default 0 for backwards
+    // compatibility.
     CaptureRequest(CaptureMode mode,
                    const uint delay = 0,
                    QVariant data = QVariant(),
-                   ExportTask tasks = NO_TASK);
+                   ExportTask tasks = NO_TASK,
+                   const uint delayAfterSelection = 0);
 
     void setStaticID(uint id);
+    void setDelayAfterSelection(uint delayMs);
 
     uint id() const;
     uint delay() const;
+    uint delayAfterSelection() const;
     QString path() const;
     QVariant data() const;
     CaptureMode captureMode() const;
@@ -53,6 +60,7 @@ public:
 private:
     CaptureMode m_mode;
     uint m_delay;
+    uint m_delayAfterSelection{ 0 };
     QString m_path;
     ExportTask m_tasks;
     QVariant m_data;
