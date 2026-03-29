@@ -47,6 +47,7 @@ target_sources(flameshot PRIVATE save/savetool.h save/savetool.cpp)
 target_sources(flameshot PRIVATE accept/accepttool.h accept/accepttool.cpp)
 target_sources(flameshot PRIVATE invert/inverttool.h invert/inverttool.cpp)
 target_sources(flameshot PRIVATE selection/selectiontool.h selection/selectiontool.cpp)
+
 target_sources(
   flameshot
   PRIVATE text/textconfig.h
@@ -69,3 +70,9 @@ target_sources(
           abstracttwopointtool.h
           capturetool.h
           toolfactory.h)
+
+# Delay tool sources: in-capture delay +/- buttons
+target_sources(
+  flameshot
+  PRIVATE delay/delayaddtool.h delay/delayaddtool.cpp
+          delay/delaysubtool.h delay/delaysubtool.cpp)

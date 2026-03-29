@@ -50,6 +50,8 @@ public:
         TYPE_INVERT = 22,
         TYPE_ACCEPT = 23,
         TYPE_CANCEL = 24,
+        TYPE_DELAY_DECREASE = 25,
+        TYPE_DELAY_INCREASE = 26,
     };
     Q_ENUM(Type);
 
@@ -77,7 +79,10 @@ public:
         // increase tool size for all tools
         REQ_INCREASE_TOOL_SIZE,
         // decrease tool size for all tools
-        REQ_DECREASE_TOOL_SIZE
+        REQ_DECREASE_TOOL_SIZE,
+        // increase/decrease delay seconds (in-capture tools)
+        REQ_DELAY_INCREASE,
+        REQ_DELAY_DECREASE
     };
 
     explicit CaptureTool(QObject* parent = nullptr)

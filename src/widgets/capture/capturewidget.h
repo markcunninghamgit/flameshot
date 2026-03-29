@@ -232,4 +232,7 @@ private:
     int m_gridSize{ 10 };
 
     bool m_clipboardWorkaroundDone{ false };
+    // Helper methods for delayed capture handling
+    void scheduleDelayedCapture(uint postDelayMs);
+    void adjustDelaySeconds(int deltaSeconds);
 };

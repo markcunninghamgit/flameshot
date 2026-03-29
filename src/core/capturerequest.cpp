@@ -13,9 +13,11 @@
 CaptureRequest::CaptureRequest(CaptureRequest::CaptureMode mode,
                                const uint delay,
                                QVariant data,
-                               CaptureRequest::ExportTask tasks)
+                               CaptureRequest::ExportTask tasks,
+                               const uint delayAfterSelection)
   : m_mode(mode)
   , m_delay(delay)
+  , m_delayAfterSelection(delayAfterSelection)
   , m_tasks(tasks)
   , m_data(std::move(data))
 {
@@ -35,6 +37,11 @@ CaptureRequest::CaptureMode CaptureRequest::captureMode() const
 uint CaptureRequest::delay() const
 {
     return m_delay;
+}
+
+uint CaptureRequest::delayAfterSelection() const
+{
+    return m_delayAfterSelection;
 }
 
 QString CaptureRequest::path() const
@@ -85,4 +92,9 @@ void CaptureRequest::addPinTask(const QRect& pinWindowGeometry)
 void CaptureRequest::setInitialSelection(const QRect& selection)
 {
     m_initialSelection = selection;
+}
+
+void CaptureRequest::setDelayAfterSelection(uint d)
+{
+    m_delayAfterSelection = d;
 }
